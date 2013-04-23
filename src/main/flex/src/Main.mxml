@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="application_creationCompleteHandler(event)">
+	<fx:Declarations>
+		<s:RemoteObject id="contactService" destination="contactService"
+						endpoint="http://localhost:4152/core/messagebroker/amf" result="contactService_resultHandler(event)" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import net.smanne.domain.Contact;
+			[Bindable]
+			public var resultCollection:ArrayCollection= new ArrayCollection();
+			[Bindable]
+			public  var contact:Contact=new Contact();
+			protected function application_creationCompleteHandler(event:FlexEvent):void
+			{
+				contactService.getAllContacts();
+			}
+			
+			
+			protected function contactService_resultHandler(event:ResultEvent):void
+			{
+				resultCollection=event.result as ArrayCollection;
+			}
+			
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				formGroup.visible=true;
+				contactService.saveContact();
+			}
+			
+			
+			protected function contactGrid_itemClickHandler(event:ListEvent):void
+			{
+				formGroup.visible=true;
+				contact = event.itemRenderer.data as Contact;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Group width="100%" height="100%">
+		
+		<mx:DataGrid width="1007" x="24" y="46" dataProvider="{resultCollection}"  itemClick="contactGrid_itemClickHandler(event)">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Id" dataField="id"/>
+				<mx:DataGridColumn headerText="First Name" dataField="firstName"/>
+				<mx:DataGridColumn headerText="Last Name" dataField="lastName"/>
+			</mx:columns>
+		</mx:DataGrid>
+		<s:Button label="Add" x="961" y="10" click="button1_clickHandler(event)"/>
+		<s:Group id="formGroup" visible="true" height="228" y="206">
+			<mx:Form  x="24" y="7" width="480" height="210" >
+				<mx:FormItem  label="Id">
+					<s:TextInput text="{contact.id}"/>
+				</mx:FormItem>
+				<mx:FormItem  label="firstName">
+					<s:TextInput text="{contact.firstName}"/>
+				</mx:FormItem>
+				<mx:FormItem  label="lastName">
+					<s:TextInput text="{contact.lastName}"/>
+				</mx:FormItem>
+				<mx:FormItem  label="phone">
+					<s:TextInput text="{contact.phone}"/>
+				</mx:FormItem>
+				<mx:FormItem  label="email">
+					<s:TextInput text="{contact.email}"/>
+				</mx:FormItem>
+				
+			</mx:Form>
+			<mx:Form x="525" y="7" width="506" height="210">
+				<mx:FormItem id="city" label="City">
+					<s:TextInput text="{contact.city}"/>
+				</mx:FormItem>
+				<mx:FormItem id="state" label="State">
+					<s:TextInput text="{contact.state}"/>
+				</mx:FormItem>
+				<mx:FormItem id="zip" label="Zip">
+					<s:TextInput text="{contact.zip}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Country">
+					<s:TextInput text="{contact.country}"/>
+				</mx:FormItem>
+				<mx:FormItem label="web">
+					<s:TextInput text="{contact.web}"/>
+				</mx:FormItem>
+				
+			</mx:Form>
+		</s:Group>
+	</s:Group>
+</s:Application>
